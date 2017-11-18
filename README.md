@@ -5,7 +5,11 @@ Python implementation of the Simplex algorithm, done for the OA course supervise
 ## Installation
 
 Dependencies:
-- `sortedcontainers`: Used to keep a dictionary with ordered keys. 
+- [SortedContainers](http://www.grantjenks.com/docs/sortedcontainers/)
+
+```
+pip install sortedcontainers
+```
 
 ## Usage
 
@@ -23,7 +27,7 @@ optional arguments:
                         (default: bland)
 ```
 
-This information can be obtained by running `python3 simplex.py --help".
+Running `python3 simplex.py --help` will output similar instructions.
 
 The `file` argument must contain some LP problem represented as:
 
@@ -43,8 +47,8 @@ where the goal is to maximize `c.x` under constraints `Ax <= b`, `x >= 0`.
 ## Assignment Notes
 
 ### Pivot Rules
-4 different pivot rules where implemented:
-- **Bland's rule**. See [here](https://en.wikipedia.org/wiki/Bland's_rule) for an explaination.
+4 different pivot rules were implemented:
+- **Bland's rule**. See [here](https://en.wikipedia.org/wiki/Bland's_rule) for an explanation.
 - **Maximum coefficient rule**. At each step, we choose the entering variable with the *largest* coefficient in the objective function.
 - **Minimum coefficient rule**. At each step, we choose the entering variable with the *smallest* coefficient in the objective function.
 - **Random rule**. We pick entering and leaving variables uniformly at random among valid candidates.
@@ -55,11 +59,12 @@ where the goal is to maximize `c.x` under constraints `Ax <= b`, `x >= 0`.
 
 Three problems have been taken from exercise sheets and formatted as valid input files for our solver.
 - `tests/lumberjack`.
-- `tests/busdrivers`.
-  The **Bus drivers** problem consists of finding the *minimum amount* of bus drivers to hire when each driver works for 5 consecutive days and you need 17 drivers working on Mondays, 21 on Tuesdays, 15 on Wednesdays, 20 on Thursdays, 23 on Fridays, 15 on Saturdays and 9 on Sundays.
+- `tests/busdrivers`.  
+  The **Bus drivers** problem consists in finding the *minimum amount* of bus drivers to hire when each driver works for 5 consecutive days and you need 17 drivers working on Mondays, 21 on Tuesdays, 15 on Wednesdays, 20 on Thursdays, 23 on Fridays, 15 on Saturdays and 9 on Sundays.
   We can express this as a LP problem by defining variables `x_i`: *number of drivers hired to start working on the ith day of the week*.
   Then for each day `i`, we need the sufficient amount of drivers still working that day.
   We end up with the following constraints:
+
   - `x_1 + x_4 + x_5 + x_6 + x_7 >= 17`
   - `x_1 + x_2 + x_5 + x_6 + x_7 >= 21`
   - `x_1 + x_2 + x_3 + x_6 + x_7 >= 15`
@@ -67,7 +72,10 @@ Three problems have been taken from exercise sheets and formatted as valid input
   - `x_1 + x_2 + x_3 + x_4 + x_5 >= 23`
   - `x_2 + x_3 + x_4 + x_5 + x_6 >= 15`
   - `x_3 + x_4 + x_5 + x_6 + x_7 >= 9`
-  with the aim of minimizing `x_1 + ... + x_n`.
-  Once expressed as a maximization problem in the defined format, running our solver gives us an optimal minimum amount of `73/3` drivers to hire. Turning this into an integer optimal solution, we get `25` drivers.
 
-- `tests/lumberjack`.
+  With the aim of minimizing `x_1 + ... + x_n`.  
+  Once expressed as a maximization problem in the defined format, running our solver gives us an optimal minimum value of `73/3` drivers to hire. Turning this into an integer optimal solution, we get `25` drivers.
+
+- `tests/fraction`.
+
+#### Randomly generated
