@@ -1,6 +1,7 @@
 from fractions import Fraction
 from sortedcontainers import SortedDict, SortedSet
 from enum import Enum
+from math import inf
 
 
 FeasibleResult = Enum("FeasibleResult", "UNBOUNDED, BOUNDED")
@@ -20,7 +21,6 @@ class Tableau():
         nslack = self.n - len(c)
 
         # include slack variables inside everything
-        self.c = c + [0] * nslack
         self.A = [row + [0] * nslack for row in A]
         self.b = b
         self.pivot_rule = pivot
@@ -52,9 +52,9 @@ class Tableau():
             if b[k] < 0:
                 for i in range(n):
                     A[k][i] *= -1
+                b[k] *= -1
                 A[k][self.n] = 1
                 A[k][self.nv + k] = -1
-                b[k] *= -1
 
                 self.basis.add(self.n)
                 self.rows[self.n] = k
@@ -80,27 +80,40 @@ class Tableau():
     def set_objective_vector(self, c):
         self.opt = 0
 
+        c = c + [0] * (self.n - len(c))
+
         for v in self.basis:
             if c[v] == 0:
                 continue
 
             r = self.rows[v]
+            coef = c[v]
             for j in range(self.n):
-                c[j] -= c[v] * self.A[r][j]
-            self.opt -= c[v] * self.b[r]
+                c[j] -= coef * self.A[r][j]
+            self.opt -= coef * self.b[r]
 
         self.c = c
 
 
     def remove_additional_vars(self):
         d = self.nb_additional_vars
+        self.nb_additional_vars = 0
         self.n -= d
 
-        for row in self.A:
-            del row[-d:]
+        # remove any additional variable still in the basis
+        for j in self.basis:
+            if j > self.n:
+                r = self.rows[j]
+                for i in range(self.n):
+                    if self.A[r][i] != 0:
+                        self.pivot(i, j, r)
+                        break
 
         for i in range(self.n, self.n + d):
             self.nonbasis.remove(i)
+
+        for row in self.A:
+            del row[-d:]
 
 
     def get_entering_candidates(self):
@@ -108,12 +121,18 @@ class Tableau():
 
 
     def get_leaving_candidates(self, entering):
+        m = inf
         C = []
 
         for k in self.basis:
             r = self.rows[k]
             if self.A[r][entering] > 0:
-                C.append(((k, r), self.b[r] / self.A[r][entering]))
+                ratio = self.b[r] / self.A[r][entering]
+                if ratio == m:
+                    C.append(k)
+                elif ratio < m:
+                    m = ratio
+                    C = [k]
 
         return C
 
@@ -135,14 +154,14 @@ class Tableau():
             if len(leaving_candidates) == 0:
                 return FeasibleResult.UNBOUNDED
 
-            (lv, lr), _ = self.pivot_rule.pick_leaving_var(leaving_candidates)
+            leaving = self.pivot_rule.pick_leaving_var(leaving_candidates)
 
-            self.pivot(entering, lv, lr)
+            self.pivot(entering, leaving)
             self.count += 1
 
             if verbose:
                 print("The entering variable is x%i" % (entering + 1))
-                print("The leaving variable is x%i" % (lv + 1))
+                print("The leaving variable is x%i" % (leaving + 1))
                 self.print()
 
 
@@ -159,10 +178,10 @@ class Tableau():
         return ", ".join(res)
 
 
-    def pivot(self, entering, lv, lr):
-        r = 1 / self.A[lr][entering]
+    def pivot(self, entering, lv):
+        lr = self.rows[lv]
 
-        del self.rows[lv]
+        r = 1 / self.A[lr][entering]
 
         for j in range(self.n):
             self.A[lr][j] *= r
@@ -170,6 +189,7 @@ class Tableau():
 
         self.basis.remove(lv)
         self.nonbasis.add(lv)
+        del self.rows[lv]
 
         for k in self.basis:
             kr = self.rows[k]
