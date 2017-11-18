@@ -39,3 +39,15 @@ class MaximumPivot(BlandPivot):
                 k = p
 
         return (k, M)
+
+class MinimumPivot(BlandPivot):
+    def pick_entering_var(candidates):
+        k = None
+        m = inf
+
+        for p, c in candidates:
+            if c < m:
+                m = c
+                k = p
+
+        return (k, m)

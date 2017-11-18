@@ -8,7 +8,8 @@ if __name__ == "__main__":
     pivots = {
         "bland": pivot.BlandPivot,
         "random": pivot.RandomPivot,
-        "maximum": pivot.MaximumPivot
+        "maximum": pivot.MaximumPivot,
+        "minimum": pivot.MinimumPivot
     }
 
     parser = ap.ArgumentParser(
@@ -16,12 +17,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument("-v", "--verbose", action="store_true",
-            help="display ")
+            help="enable verbose output")
 
     parser.add_argument("-p", "--pivot", default="bland", choices=pivots.keys(),
-            help="select the pivot rule to be used during resolution (default: bland).")
+            help="select the pivot rule to be used during resolution (default: bland)")
 
-    parser.add_argument("file")
+    parser.add_argument("file",
+            help="the input LP problem")
 
     inputs = parser.parse_args()
 

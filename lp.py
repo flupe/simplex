@@ -35,10 +35,10 @@ class LP:
                 T.remove_additional_vars()
                 print("Found a basic feasible solution.: %s" % T.get_solution())
                 print("Removed additional variables from the tableau.\n")
-                T.set_objective_vector(self.c)
                 print("=== PHASE 2 ===")
 
         # PHASE 2
+        T.set_objective_vector(self.c)
         R = T.phase(verbose)
 
         if R == FeasibleResult.BOUNDED:
