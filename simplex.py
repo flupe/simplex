@@ -6,10 +6,11 @@ from lp import LP
 
 if __name__ == "__main__":
     pivots = {
-        "bland": pivot.BlandPivot,
-        "random": pivot.RandomPivot,
-        "maximum": pivot.MaximumPivot,
-        "minimum": pivot.MinimumPivot
+        "bland": pivot.BlandRule,
+        "random": pivot.RandomRule,
+        "largest": pivot.LargestCoefficientRule,
+        "smallest": pivot.SmallestCoefficientRule,
+        "maximum": pivot.MaximumIncreaseRule
     }
 
     parser = ap.ArgumentParser(

@@ -1,10 +1,7 @@
 from fractions import Fraction
 from sortedcontainers import SortedDict, SortedSet
-from enum import Enum
+from pivot import FeasibleResult
 from math import inf
-
-
-FeasibleResult = Enum("FeasibleResult", "UNBOUNDED, BOUNDED")
 
 
 class Tableau():
@@ -143,18 +140,11 @@ class Tableau():
             self.print()
 
         while True:
-            entering_candidates = self.get_entering_candidates()
+            result, entering, leaving = self.pivot_rule.pick_leaving_and_entering_vars(self)
 
-            if len(entering_candidates) == 0:
-                return FeasibleResult.BOUNDED
-
-            entering, _ = self.pivot_rule.pick_entering_var(entering_candidates)
-            leaving_candidates = self.get_leaving_candidates(entering)
-
-            if len(leaving_candidates) == 0:
-                return FeasibleResult.UNBOUNDED
-
-            leaving = self.pivot_rule.pick_leaving_var(leaving_candidates)
+            # at this point we already decided if the problem is bounded or unbounded
+            if result is not FeasibleResult.UNKNOWN:
+                return result
 
             self.pivot(entering, leaving)
             self.count += 1

@@ -1,4 +1,5 @@
-from tableau import Tableau, FeasibleResult
+from tableau import Tableau
+from pivot import FeasibleResult
 
 def vect_vars(a):
     return " + ".join(["%i x%i" % (c, i + 1) for i, c in enumerate(a) if c != 0])
