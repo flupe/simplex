@@ -5,23 +5,25 @@ def vect_vars(a):
 
 class LP:
     def solve(self, verbose = False):
-        print("The input linear program is:\n")
-        print("Maximize %s" % vect_vars(self.c))
-        print("Such that:")
+        if verbose:
+            print("The input linear program is:\n")
+            print("Maximize %s" % vect_vars(self.c))
+            print("Such that:")
 
-        for k, row in enumerate(self.A):
-            print("\t%s <= %s" % (vect_vars(row), str(self.b[k])))
+            for k, row in enumerate(self.A):
+                print("\t%s <= %s" % (vect_vars(row), str(self.b[k])))
 
-        print("\t" + ", ".join(["x%i" % (i + 1) for i in range(self.n)]) + " are non-negative\n")
+            print("\t" + ", ".join(["x%i" % (i + 1) for i in range(self.n)]) + " are non-negative\n")
 
         T = self.T = Tableau(self.c, self.A, self.b, self.pivot)
         phase_one_objective = T.initialize_basis()
 
         # PHASE 1
         if T.nb_additional_vars > 0:
-            print("=== PHASE 1 ===")
-            print("Added %i new positive variables." % T.nb_additional_vars)
-            print("Now trying to maximize: %s" % vect_vars(phase_one_objective))
+            if verbose:
+                print("=== PHASE 1 ===")
+                print("Added %i new positive variables." % T.nb_additional_vars)
+                print("Now trying to maximize: %s" % vect_vars(phase_one_objective))
 
             T.set_objective_vector(phase_one_objective)
             T.phase(verbose)
@@ -33,9 +35,10 @@ class LP:
 
             else:
                 T.remove_additional_vars()
-                print("Found a basic feasible solution.: %s" % T.get_solution())
-                print("Removed additional variables from the tableau.\n")
-                print("=== PHASE 2 ===")
+                if verbose:
+                    print("Found a basic feasible solution.: %s" % T.get_solution())
+                    print("Removed additional variables from the tableau.\n")
+                    print("=== PHASE 2 ===")
 
         # PHASE 2
         T.set_objective_vector(self.c)
